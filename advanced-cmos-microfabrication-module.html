@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ECE112 / 213ECE2362 — Advanced CMOS Microfabrication</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+
+  --paper:#F4F6F5;
+  --paper-2:#EAEEEC;
+  --ink:#11161B;
+  --ink-soft:#4A545C;
+  --rule:#CFD6D2;
+  --panel:#0E1419;
+  --panel-2:#18212A;
+  --panel-ink:#DCE4E8;
+  --accent:#0E6F7E;
+  --amber:#B57C08;
+
+  /* SEMulator3D material legend — used only inside diagrams */
+  --m-si:#B03A2E;
+  --m-sige:#8E44AD;
+  --m-ox:#5DADE2;
+  --m-ild:#AED6F1;
+  --m-nit:#27AE60;
+  --m-poly:#8C9B9D;
+  --m-hk:#F1C40F;
+  --m-wfm:#3D566E;
+  --m-w:#212F3C;
+  --m-void:#F4F6F5;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Source Serif 4',Georgia,'Times New Roman',serif;
+  font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0C1116;--paper-2:#141C23;--ink:#E6ECEA;--ink-soft:#9AA8AF;
+    --rule:#2A353D;--panel:#070B0E;--panel-2:#131B22;--accent:#4FB3C4;--amber:#D9A62B;
+    --m-void:#0C1116;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0C1116;--paper-2:#141C23;--ink:#E6ECEA;--ink-soft:#9AA8AF;
+  --rule:#2A353D;--panel:#070B0E;--panel-2:#131B22;--accent:#4FB3C4;--amber:#D9A62B;
+  --m-void:#0C1116;
+}
+
+h1,h2,h3,h4,.ui{font-family:'Archivo','Helvetica Neue',Arial,sans-serif;font-weight:600;letter-spacing:-.015em}
+.mono{font-family:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;font-variant-ligatures:none}
+
+/* ---------- masthead ---------- */
+.mast{
+  position:sticky;top:0;z-index:40;
+  padding:calc(env(safe-area-inset-top,0px) + 9px) 20px 9px;
+  background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule);
+  display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;
+}
+.mast .code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:.02em}
+.mast .ttl{font-family:'Archivo',sans-serif;font-weight:600;font-size:15px}
+.mast .sem{margin-left:auto;font-size:12px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace}
+
+/* ---------- instrument bay (hero) ---------- */
+.bay{background:var(--panel);color:var(--panel-ink);padding:34px 20px 30px}
+.bay-in{max-width:1120px;margin:0 auto}
+.bay h1{
+  font-size:clamp(28px,5.2vw,46px);line-height:1.04;margin:0 0 6px;
+  color:#fff;font-weight:700;letter-spacing:-.03em;
+}
+.bay .sub{color:#8FA3AD;font-size:15px;max-width:60ch;margin:0 0 24px}
+.bay .sub b{color:var(--m-hk);font-weight:600}
+
+.rig{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:860px){.rig{grid-template-columns:1fr}}
+
+.screen{background:var(--panel-2);border:1px solid #243039;border-radius:3px;padding:12px;overflow-x:auto}
+.screen svg{display:block;width:100%;height:auto;max-width:100%;min-width:430px}
+
+.steps{list-style:none;margin:0;padding:0;border:1px solid #243039;border-radius:3px;overflow:hidden}
+.steps li{border-bottom:1px solid #1E2830}
+.steps li:last-child{border-bottom:0}
+.steps button{
+  width:100%;text-align:left;background:transparent;border:0;cursor:pointer;
+  color:#93A4AD;font-family:'IBM Plex Mono',monospace;font-size:11.5px;
+  padding:7px 11px;display:flex;gap:10px;align-items:center;line-height:1.35;
+}
+.steps button:hover{background:#1B242C;color:#CFDBE1}
+.steps button:focus-visible{outline:2px solid var(--m-hk);outline-offset:-2px}
+.steps .n{color:#4E5F69;min-width:16px}
+.steps li[aria-current="true"] button{background:#202C35;color:#fff}
+.steps li[aria-current="true"] .n{color:var(--m-hk)}
+
+.readout{margin-top:12px;border:1px solid #243039;border-radius:3px;padding:11px 12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#93A4AD}
+.readout div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+.readout span:last-child{color:#DCE4E8;text-align:right}
+
+.ctl{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.ctl button{
+  font-family:'Archivo',sans-serif;font-weight:500;font-size:13px;
+  background:#1E2831;color:#CFDBE1;border:1px solid #2C3A44;border-radius:3px;
+  padding:7px 14px;cursor:pointer;
+}
+.ctl button:hover{background:#27343E;color:#fff}
+.ctl button:disabled{opacity:.35;cursor:default}
+.ctl button:focus-visible{outline:2px solid var(--m-hk);outline-offset:2px}
+.ctl .pos{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6F8089;margin-left:4px}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7E9099}
+.legend i{display:inline-block;width:9px;height:9px;margin-right:5px;border-radius:1px;vertical-align:baseline}
+
+/* ---------- body layout ---------- */
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:186px minmax(0,1fr);gap:40px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;gap:0}}
+
+nav.rail{position:sticky;top:76px;align-self:start;padding:34px 0;font-family:'Archivo',sans-serif;font-size:13px}
+@media (max-width:900px){nav.rail{display:none}}
+nav.rail a{display:block;padding:5px 0 5px 11px;color:var(--ink-soft);text-decoration:none;border-left:2px solid var(--rule)}
+nav.rail a:hover{color:var(--accent);border-left-color:var(--accent)}
+nav.rail .grp{margin:16px 0 5px;font-size:10.5px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace}
+
+main{padding:34px 0 80px;min-width:0}
+section{margin-bottom:54px;scroll-margin-top:84px}
+h2{font-size:clamp(21px,3vw,27px);margin:0 0 4px;letter-spacing:-.025em}
+.dek{color:var(--ink-soft);font-size:15px;margin:0 0 22px;max-width:66ch}
+h3{font-size:17.5px;margin:26px 0 8px}
+h4{font-size:14px;margin:18px 0 6px;font-weight:600}
+p{max-width:68ch;margin:0 0 14px}
+ul,ol{max-width:68ch;padding-left:20px}
+li{margin-bottom:6px}
+a{color:var(--accent)}
+code{font-family:'IBM Plex Mono',monospace;font-size:.88em;background:var(--paper-2);padding:1px 5px;border-radius:2px}
+
+/* unit strata markers — colour encodes the material that defines each unit */
+.unit{border-left:3px solid var(--rule);padding:2px 0 2px 16px;margin:0 0 18px}
+.unit[data-u="1"]{border-left-color:var(--m-si)}
+.unit[data-u="2"]{border-left-color:#C0399B}
+.unit[data-u="3"]{border-left-color:var(--m-hk)}
+.unit[data-u="4"]{border-left-color:var(--m-poly)}
+.unit[data-u="5"]{border-left-color:#B9770E}
+.unit h4{margin-top:0;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-soft);font-weight:400}
+.unit p{margin-bottom:6px;font-size:16px}
+
+table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0 18px;font-family:'Archivo',sans-serif}
+th,td{border-bottom:1px solid var(--rule);padding:7px 9px;text-align:left;vertical-align:top}
+th{font-weight:600;font-size:12px;color:var(--ink-soft)}
+td.n,th.n{text-align:center;font-family:'IBM Plex Mono',monospace}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+.box{background:var(--paper-2);border:1px solid var(--rule);border-radius:3px;padding:18px 20px;margin:18px 0}
+.box h4{margin-top:0}
+.box p:last-child,.box ul:last-child,.box ol:last-child{margin-bottom:0}
+
+.script{border-left:3px solid var(--accent);padding-left:16px;margin:16px 0}
+.script .cue{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);display:block;margin-bottom:3px}
+.script p{font-size:16px;margin-bottom:12px}
+
+/* EOT calculator */
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,260px);gap:22px;align-items:start}
+@media (max-width:700px){.calc{grid-template-columns:1fr}}
+.slider{margin-bottom:16px}
+.slider label{display:flex;justify-content:space-between;font-family:'Archivo',sans-serif;font-size:13px;margin-bottom:5px}
+.slider label b{font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--accent)}
+.slider input[type=range]{width:100%;accent-color:var(--accent)}
+.out{background:var(--panel);color:#fff;border-radius:3px;padding:16px 18px}
+.out .big{font-family:'IBM Plex Mono',monospace;font-size:31px;line-height:1.1;color:var(--m-hk)}
+.out .cap{font-family:'Archivo',sans-serif;font-size:11.5px;color:#8FA3AD;margin-top:3px}
+.out hr{border:0;border-top:1px solid #243039;margin:13px 0}
+.out .row{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#B6C4CB;padding:2px 0}
+
+/* quiz */
+.q{border-top:1px solid var(--rule);padding:18px 0}
+.q:first-of-type{border-top:0}
+.q .stem{font-weight:600;margin-bottom:10px;max-width:68ch}
+.opt{display:block;max-width:68ch;margin-bottom:6px;padding:8px 11px;border:1px solid var(--rule);border-radius:3px;cursor:pointer;font-size:15.5px;background:transparent}
+.opt:hover{border-color:var(--accent)}
+.opt input{margin-right:9px;accent-color:var(--accent)}
+.opt.right{border-color:#1E8449;background:color-mix(in srgb,#1E8449 11%,transparent)}
+.opt.wrong{border-color:#A93226;background:color-mix(in srgb,#A93226 9%,transparent)}
+.fb{font-size:14.5px;color:var(--ink-soft);margin-top:9px;max-width:68ch;display:none}
+.fb.show{display:block}
+.score{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--accent);margin-top:10px}
+
+footer{border-top:1px solid var(--rule);padding:26px 20px 40px;font-size:13px;color:var(--ink-soft)}
+footer .fin{max-width:1120px;margin:0 auto}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="mast">
+  <span class="code">ECE112 · 213ECE2362</span>
+  <span class="ttl">Advanced CMOS Microfabrication</span>
+  <span class="sem">Digital content sample · 2026–27 Odd</span>
+</div>
+
+<!-- ============ INSTRUMENT BAY ============ -->
+<div class="bay">
+ <div class="bay-in">
+  <h1>Building a transistor gate,<br>one process step at a time</h1>
+  <p class="sub">A worked sample from Unit 3 of the course: the <b>replacement metal gate</b> flow. Step through the eight process operations and watch the cross-section change — the same view students extract from SEMulator3D® in the laboratory.</p>
+
+  <div class="rig">
+    <div>
+      <div class="screen" id="screen" aria-live="polite"></div>
+      <div class="ctl">
+        <button id="prev" type="button">Previous step</button>
+        <button id="next" type="button">Next step</button>
+        <span class="pos mono" id="pos">Step 1 of 8</span>
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div>
+      <ol class="steps" id="steplist"></ol>
+      <div class="readout" id="readout"></div>
+    </div>
+  </div>
+ </div>
+</div>
+
+<div class="wrap">
+<nav class="rail">
+  <div class="grp">Course</div>
+  <a href="#syllabus">Syllabus</a>
+  <a href="#outcomes">Outcomes &amp; mapping</a>
+  <a href="#map">Content map</a>
+  <div class="grp">Sample lesson 3.3</div>
+  <a href="#lesson">Why the gate changed</a>
+  <a href="#video">Video storyboard</a>
+  <a href="#eot">EOT workbench</a>
+  <a href="#misconception">Misconception check</a>
+  <div class="grp">Practice</div>
+  <a href="#lab">Laboratory brief</a>
+  <a href="#quiz">Self-check</a>
+  <div class="grp">Design</div>
+  <a href="#pedagogy">Pedagogy</a>
+  <a href="#production">Production plan</a>
+</nav>
+
+<main>
+
+<!-- ============ SYLLABUS ============ -->
+<section id="syllabus">
+  <h2>Syllabus</h2>
+  <p class="dek">Regulation 2025 · 2025–29 batch · Professional Elective · Integrated theory and simulation laboratory.</p>
+
+  <div class="scroll">
+  <table>
+    <tr><th>Course code</th><td>ECE112 / 213ECE2362</td><th>Course title</th><td>Advanced CMOS Microfabrication</td></tr>
+    <tr><th>Category</th><td>Professional Elective</td><th>Type</th><td>Integrated Theory + Lab (SEMulator3D®)</td></tr>
+    <tr><th>L–T–P–X–C</th><td class="mono">3–1–0–0–4</td><th>Course level</th><td>3 · NCrF Level 6</td></tr>
+    <tr><th>Contact hours</th><td>45 in-class + 30 laboratory</td><th>Self-directed</th><td>75 hours</td></tr>
+    <tr><th>Pre-requisite</th><td colspan="3">Fundamentals of physics and introductory electronics</td></tr>
+  </table>
+  </div>
+
+  <h3>Units</h3>
+
+  <div class="unit" data-u="1">
+    <h4>Unit 1 — Semiconductor ecosystem and scaling fundamentals · 6 L + 6 P</h4>
+    <p>Design, fabrication, packaging and product chain; self-reliance and the Indian Semiconductor Mission. Advantages of microfabrication and scaling; Moore's Law, Dennard scaling, the interconnect bottleneck. FEOL and BEOL. Cleanroom classes and contamination control. Mask layout for NMOS, PMOS and the inverter; DRC concepts; relating layout layers to the physical cross-section.</p>
+  </div>
+
+  <div class="unit" data-u="2">
+    <h4>Unit 2 — Lithography and patterning · 6 L + 6 P</h4>
+    <p>Optical lithography; positive and negative photoresist chemistry; spin coat, soft bake, exposure, development. Resolution limit and the Rayleigh criterion. Exposure source evolution: i-line → KrF → ArF → EUV. Resolution enhancement: OPC, PSM, SRAF. Immersion lithography. Multiple patterning — LELE, SADP and SAQP process flows, overlay budget, sub-7 nm application. Cost and complexity trade-offs; design-rule implications.</p>
+  </div>
+
+  <div class="unit" data-u="3">
+    <h4>Unit 3 — Advanced CMOS FinFET process: FEOL modules · 6 L + 6 P</h4>
+    <p>Isolation: LOCOS versus STI, stress effects, integration advantages. Device architecture: planar MOSFET to FinFET; fin formation, aspect ratio, SiGe and strain engineering. Gate module: SiO₂ versus high-k (HfO₂), polysilicon versus metal gate, gate-first versus gate-last, replacement metal gate flow, work-function metal selection. Well and junction module: implantation dose and energy, LDD and halo implants, RTA activation. Spacer engineering and the contact etch stop layer.</p>
+  </div>
+
+  <div class="unit" data-u="4">
+    <h4>Unit 4 — Advanced CMOS FinFET process: contact and silicide modules · 6 L + 6 P</h4>
+    <p>Contact resistance in a simple metal–silicon contact; metal silicides and self-aligned silicidation; evolution from Ti to Co to Ni silicide — thermal stability, junction leakage, FinFET integration. Contact plug formation: tungsten plug, TiN and TaN barriers. Contact scaling at advanced nodes. Thermal budget constraints.</p>
+  </div>
+
+  <div class="unit" data-u="5">
+    <h4>Unit 5 — Interconnect and dielectric modules (BEOL) · 6 L + 6 P</h4>
+    <p>Multilevel interconnect; RC delay and electromigration; aluminium to copper. Damascene and dual-Damascene flows; barrier and seed layers, copper electroplating, CMP. Interlayer dielectric scaling: SiO₂ → SiOF → SiOC → porous SiOC; air-gap dielectrics. BEOL reliability — electromigration, stress voiding, TDDB. Technology roadmap from 180 nm to 7 nm; full FEOL-to-BEOL integration review; yield and manufacturability.</p>
+  </div>
+
+  <h3>Texts and references</h3>
+  <p>S. M. Sze, <em>VLSI Technology</em>, 2nd ed., McGraw-Hill · S. A. Campbell, <em>Fabrication Engineering at the Micro and Nanoscale</em>, Oxford. Reference: R. C. Jaeger, <em>Introduction to Microelectronic Fabrication</em> · Wolf &amp; Tauber, <em>Silicon Processing for the VLSI Era</em>, Vols. 1–4 · M. Madou, <em>Fundamentals of Microfabrication and Nanotechnology</em>. Online: NPTEL <em>Fundamentals of Microfabrication</em> and <em>Semiconductor Device Fundamentals</em>.</p>
+
+  <h3>Assessment</h3>
+  <div class="scroll">
+  <table>
+    <tr><th>Component</th><th class="n">Weight</th><th>Outcomes</th><th>Portion</th></tr>
+    <tr><td>Sessional examination I</td><td class="n">17.5%</td><td>CO1, CO2</td><td>Units 1–2</td></tr>
+    <tr><td>Mid-semester laboratory assessment</td><td class="n">10%</td><td>CO1–CO3</td><td>Assignments 1–5</td></tr>
+    <tr><td>Sessional examination II</td><td class="n">17.5%</td><td>CO3, CO4</td><td>Units 3–4</td></tr>
+    <tr><td>Regular laboratory performance</td><td class="n">5%</td><td>CO1–CO5</td><td>All 10 assignments</td></tr>
+    <tr><td>End-semester theory examination</td><td class="n">35%</td><td>CO1–CO5</td><td>Units 1–5</td></tr>
+    <tr><td>End-semester laboratory examination</td><td class="n">15%</td><td>CO5</td><td>All 10 assignments</td></tr>
+  </table>
+  </div>
+  <p>Laboratory examinations are marked in four parts: process setup, understanding and analysis, cross-section extraction and measurement, and engineering judgement. Indirect assessment is by course-exit survey.</p>
+</section>
+
+<!-- ============ OUTCOMES ============ -->
+<section id="outcomes">
+  <h2>Course outcomes and mapping</h2>
+  <p class="dek">On successful completion, students will be able to:</p>
+  <div class="scroll">
+  <table>
+    <tr><th class="n">CO</th><th>Statement</th><th class="n">Level</th></tr>
+    <tr><td class="n">CO1</td><td>Describe the semiconductor manufacturing ecosystem and the benefits of scaling, and relate circuit abstraction to device cross-section and mask layout.</td><td class="n">Understand</td></tr>
+    <tr><td class="n">CO2</td><td>Explain advanced lithography, including resolution limits, i-line to EUV evolution, and SADP/SAQP multiple patterning.</td><td class="n">Understand</td></tr>
+    <tr><td class="n">CO3</td><td>Analyse module-level process flows of advanced FinFET technology: isolation, gate, junction, contact and interconnect.</td><td class="n">Analyse</td></tr>
+    <tr><td class="n">CO4</td><td>Evaluate integration challenges including high-k/metal gate, silicidation and copper Damascene interconnect.</td><td class="n">Evaluate</td></tr>
+    <tr><td class="n">CO5</td><td>Apply SEMulator3D® to simulate FinFET process flows, extract cross-sections, edit layout and resolve integration problems.</td><td class="n">Apply</td></tr>
+  </table>
+  </div>
+  <div class="scroll">
+  <table>
+    <tr><th>CO</th><th class="n">PO1</th><th class="n">PO2</th><th class="n">PO5</th><th class="n">PSO1</th><th class="n">PSO2</th><th class="n">PSO3</th></tr>
+    <tr><td>CO1</td><td class="n">2</td><td class="n">2</td><td class="n">–</td><td class="n">2</td><td class="n">1</td><td class="n">–</td></tr>
+    <tr><td>CO2</td><td class="n">2</td><td class="n">1</td><td class="n">–</td><td class="n">2</td><td class="n">1</td><td class="n">–</td></tr>
+    <tr><td>CO3</td><td class="n">1</td><td class="n">2</td><td class="n">1</td><td class="n">2</td><td class="n">1</td><td class="n">1</td></tr>
+    <tr><td>CO4</td><td class="n">1</td><td class="n">2</td><td class="n">–</td><td class="n">3</td><td class="n">–</td><td class="n">–</td></tr>
+    <tr><td>CO5</td><td class="n">1</td><td class="n">2</td><td class="n">–</td><td class="n">3</td><td class="n">–</td><td class="n">–</td></tr>
+  </table>
+  </div>
+  <p>Columns PO3, PO4 and PO6–PO11 carry no mapping and are omitted here for legibility; the full matrix appears in the course plan.</p>
+</section>
+
+<!-- ============ CONTENT MAP ============ -->
+<section id="map">
+  <h2>Digital content map</h2>
+  <p class="dek">The full course is authored as 30 micro-lessons across five units. Each micro-lesson is an 8–12 minute video with a transcript, one interactive object, a misconception check and a self-assessment set. The lesson below — <strong>3.3 Gate module</strong> — is built out in full as the specimen.</p>
+
+  <div class="scroll">
+  <table>
+    <tr><th>Unit</th><th class="n">Micro-lessons</th><th>Interactive objects</th><th>SEMulator3D assignments</th></tr>
+    <tr><td>1 · Ecosystem and scaling</td><td class="n">6</td><td>Value-chain explorer; layout-to-cross-section overlay</td><td>1, 2</td></tr>
+    <tr><td>2 · Lithography and patterning</td><td class="n">6</td><td>Rayleigh resolution slider; SADP pitch-halving animation</td><td>5</td></tr>
+    <tr><td>3 · FEOL modules</td><td class="n">7</td><td><strong>RMG process stepper</strong>; <strong>EOT workbench</strong>; implant profile plotter</td><td>3, 4, 6, 7, 10</td></tr>
+    <tr><td>4 · Contact and silicide</td><td class="n">5</td><td>Silicide phase-and-temperature chart</td><td>7</td></tr>
+    <tr><td>5 · BEOL interconnect</td><td class="n">6</td><td>RC delay calculator; Damascene fill sequence</td><td>8, 9</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ============ LESSON ============ -->
+<section id="lesson">
+  <h2>Sample micro-lesson 3.3 — Why the gate had to change</h2>
+  <p class="dek">Unit 3 · CO3 and CO4 · 11 minutes of video, 25 minutes of practice, 90 minutes of laboratory.</p>
+
+  <div class="box">
+    <h4>What you will be able to do</h4>
+    <ol>
+      <li>Explain why a polysilicon gate on silicon dioxide stopped scaling below roughly the 65 nm node.</li>
+      <li>Calculate equivalent oxide thickness for a high-k dielectric and justify why the physically thicker film leaks less at the same electrical thickness.</li>
+      <li>Order the eight operations of a replacement metal gate flow and say what would fail if the sequence were gate-first instead.</li>
+    </ol>
+  </div>
+
+  <h3>The problem, stated as an engineer would state it</h3>
+  <p>Gate capacitance per unit area is <code>C = ε₀k/t</code>. Scaling the transistor means raising that capacitance, which means thinning the dielectric. By the 90 nm node, gate oxide had reached about 1.2 nm — roughly five atomic layers of SiO₂. At that thickness electrons tunnel directly through the dielectric, and gate leakage current begins to dominate the chip's standby power budget. You cannot thin the film further. The scaling path is blocked by quantum mechanics, not by lithography.</p>
+
+  <p>Three separate failures arrive at once, and it is worth naming them separately because students routinely collapse them into one:</p>
+  <ul>
+    <li><strong>Direct tunnelling through the gate dielectric.</strong> Leakage rises roughly exponentially as physical thickness falls.</li>
+    <li><strong>Polysilicon depletion.</strong> A depletion region forms at the poly–oxide interface under inversion bias, adding a capacitance in series with the oxide. This adds roughly 0.3–0.4 nm to the effective electrical thickness — a large penalty when the oxide itself is 1.2 nm.</li>
+    <li><strong>Fermi-level pinning.</strong> Put polysilicon directly on a hafnium-based dielectric and the gate's effective work function is pinned by interface states, so threshold voltage can no longer be set by doping the gate.</li>
+  </ul>
+
+  <p>The fix addresses all three. Replace SiO₂ with a higher-permittivity dielectric, so the film can be made physically thicker while keeping the same electrical thickness. Replace polysilicon with a metal, which has no depletion region and whose work function can be chosen by selecting the metal.</p>
+
+  <h3>Why the sequence has to be gate-last</h3>
+  <p>A hafnium oxide and metal gate stack does not tolerate the source–drain activation anneal, which runs above 1000 °C. Deposit the real gate first and that anneal degrades the dielectric interface and shifts the work function of the metal, so threshold voltage drifts in ways that cannot be corrected downstream.</p>
+  <p>The replacement metal gate flow sidesteps this by building a sacrificial polysilicon gate, using it to self-align the spacers and the source–drain regions, taking the high-temperature steps, and only then removing the dummy gate and filling the empty trench with the real stack. The high-k and the work-function metal never see more than a few hundred degrees. Step through the eight operations in the panel at the top of this page and watch where the dummy gate disappears.</p>
+</section>
+
+<!-- ============ VIDEO ============ -->
+<section id="video">
+  <h2>Video storyboard and narration</h2>
+  <p class="dek">Micro-lesson 3.3 · 11:20 · screen capture with tablet annotation over SEMulator3D, plus animated cross-section inserts. Every video in the course ships with a full transcript and burned-in captions.</p>
+
+  <div class="scroll">
+  <table>
+    <tr><th class="n">Time</th><th>Shot</th><th>On screen</th><th>Purpose</th></tr>
+    <tr><td class="n">0:00</td><td>Cold open</td><td>Gate leakage plotted against oxide thickness, 130 nm to 45 nm</td><td>Hook — the wall, before any theory</td></tr>
+    <tr><td class="n">0:50</td><td>Whiteboard annotation</td><td>C = ε₀k/t derived and rearranged for EOT</td><td>CO4 — the governing relation</td></tr>
+    <tr><td class="n">2:30</td><td>Animated insert</td><td>Tunnelling through 1.2 nm SiO₂ versus 4.4 nm HfO₂</td><td>The central insight, made visual</td></tr>
+    <tr><td class="n">4:10</td><td>Cross-section stills</td><td>Poly depletion region under inversion</td><td>Second failure mode, isolated</td></tr>
+    <tr><td class="n">5:30</td><td>Screen capture</td><td>SEMulator3D gate-first build; Vt shift after anneal</td><td>Shows the failure rather than asserting it</td></tr>
+    <tr><td class="n">7:00</td><td>Screen capture</td><td>RMG build, all eight steps, 3D viewer</td><td>CO5 — the flow students will run</td></tr>
+    <tr><td class="n">9:40</td><td>Cross-section measurement</td><td>Extracting gate length and high-k thickness in the viewer</td><td>Bridges lecture to laboratory task</td></tr>
+    <tr><td class="n">10:40</td><td>Close</td><td>Three questions posed, not answered</td><td>Sets up the misconception check</td></tr>
+  </table>
+  </div>
+
+  <h4>Narration, 2:30 – 4:05</h4>
+  <div class="script">
+    <span class="cue">ANIMATION — two dielectric stacks side by side, identical capacitance</span>
+    <p>Here are two capacitors. Electrically, they are the same: same area, same capacitance per unit area, so the transistor sees the same gate control from either. The one on the left is silicon dioxide, 1.2 nanometres thick. The one on the right is hafnium oxide, and it is 4.4 nanometres thick — nearly four times thicker.</p>
+    <span class="cue">ANIMATION — electron wavefunctions decay across each barrier</span>
+    <p>Now watch what an electron sees. Tunnelling probability falls off exponentially with the physical distance it has to cross. Not the electrical thickness — the physical one. On the left the barrier is five atoms wide and the electron gets through. On the right it has nearly four times as far to go, and the leakage current drops by orders of magnitude.</p>
+    <span class="cue">ANNOTATION — EOT = t × 3.9/k written over the right-hand stack</span>
+    <p>That is the whole trick, and it is worth saying plainly: the dielectric constant buys you physical thickness at constant electrical thickness. We call that electrical thickness the equivalent oxide thickness — the thickness of silicon dioxide that would have given you the same capacitance. Hafnium oxide has a dielectric constant around twenty-two against silicon dioxide's three point nine, so you get roughly five and a half times the physical thickness for free.</p>
+    <span class="cue">CUT TO — poly gate, depletion region appearing</span>
+    <p>So the dielectric problem is solved. Unfortunately, the moment you put hafnium oxide under a polysilicon gate, you create two new problems. Let us take them one at a time.</p>
+  </div>
+</section>
+
+<!-- ============ EOT ============ -->
+<section id="eot">
+  <h2>Equivalent oxide thickness workbench</h2>
+  <p class="dek">Move the sliders. This is the interactive object embedded at 3:10 in the video and reused in the Unit 3 tutorial.</p>
+
+  <div class="calc">
+    <div>
+      <div class="slider">
+        <label for="kv"><span>Dielectric constant, k</span><b id="kvOut">22.0</b></label>
+        <input type="range" id="kv" min="3.9" max="30" step="0.1" value="22">
+        <p style="font-size:13.5px;color:var(--ink-soft);margin:5px 0 0">SiO₂ 3.9 · Si₃N₄ 7 · Al₂O₃ 9 · HfSiON 15 · HfO₂ 20–25 · ZrO₂ 25</p>
+      </div>
+      <div class="slider">
+        <label for="tv"><span>Physical thickness</span><b id="tvOut">4.4 nm</b></label>
+        <input type="range" id="tv" min="0.8" max="8" step="0.1" value="4.4">
+      </div>
+      <p style="font-size:14px;color:var(--ink-soft)">The leakage figure is an order-of-magnitude estimate from direct-tunnelling behaviour, quoted against an SiO₂ film of the same equivalent oxide thickness. It is there to build intuition about the exponent, not to substitute for a measurement.</p>
+    </div>
+    <div class="out">
+      <div class="big" id="eotOut">0.78</div>
+      <div class="cap">Equivalent oxide thickness, nm</div>
+      <hr>
+      <div class="row"><span>EOT = t × 3.9/k</span><span id="formula">4.4 × 0.177</span></div>
+      <div class="row"><span>SiO₂ for same C</span><span id="sioOut">0.78 nm</span></div>
+      <div class="row"><span>Thickness gain</span><span id="gainOut">5.6×</span></div>
+      <hr>
+      <div class="row"><span>Leakage vs SiO₂</span><span id="leakOut">~10⁴× lower</span></div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h4>Try these three</h4>
+    <ol>
+      <li>Set k to 3.9. The thickness gain collapses to 1.0 — confirm you understand why this must be so.</li>
+      <li>Find the physical thickness of HfO₂ at k = 22 that gives EOT = 1.0 nm. Compare it with the SiO₂ film it replaces.</li>
+      <li>Raise k to 30. The EOT falls, but in a real stack the benefit saturates — find out why, and bring an answer on interface layers and on the soft-optical-phonon scattering that degrades channel mobility at high k.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ MISCONCEPTION ============ -->
+<section id="misconception">
+  <h2>Misconception check</h2>
+  <p class="dek">Delivered as a two-minute interstitial. Each item is a claim students routinely make in viva; the task is to say what is wrong with it, not to pick true or false.</p>
+  <ol>
+    <li><strong>"High-k materials are used because they leak less than silicon dioxide."</strong> — The material is not intrinsically less leaky. It leaks less <em>in the application</em> because the same capacitance is obtained from a physically thicker film. Change the comparison to equal physical thickness and the argument disappears.</li>
+    <li><strong>"Equivalent oxide thickness is the real thickness of the gate stack."</strong> — It is an electrical equivalence, not a measurement. A cross-section will show a physically thicker film, plus an interfacial SiO₂ layer of a few ångström that adds to EOT and that no deposition recipe fully removes.</li>
+    <li><strong>"Gate-last is used because it is simpler."</strong> — It is markedly more complex: an extra deposition, an extra patterning, a CMP, a selective removal and a metal fill. It is used because it keeps the gate stack out of the high-temperature activation anneal. Complexity was accepted in exchange for thermal budget.</li>
+  </ol>
+</section>
+
+<!-- ============ LAB ============ -->
+<section id="lab">
+  <h2>Laboratory brief — Assignment 6</h2>
+  <p class="dek">Replacement metal gate: complete simulation with metal fill and CMP · SEMulator3D® · 2 hours supervised, 3 hours independent · CO5.</p>
+
+  <h4>Task</h4>
+  <p>Starting from the supplied dummy-gate process file, complete the replacement metal gate module. Deposit the contact etch stop layer and interlayer dielectric, planarize to expose the dummy gate, remove the polysilicon selectively, deposit the high-k dielectric and work-function metal conformally, fill with tungsten, and planarize. Extract a cross-section through the gate and report four measurements.</p>
+
+  <h4>Deliverables</h4>
+  <ol>
+    <li>The completed process file and built model.</li>
+    <li>Cross-section image with physical gate length, high-k thickness, work-function metal thickness and remaining tungsten fill height measured and annotated.</li>
+    <li>One paragraph explaining what changed in the model at the poly-removal step, and what you would expect to see if the selective etch had a 10% loss of the spacer nitride.</li>
+    <li>A single-page comparison against your gate-first build from Assignment 4.</li>
+  </ol>
+
+  <h4>Rubric</h4>
+  <div class="scroll">
+  <table>
+    <tr><th>Part</th><th>Criterion</th><th class="n">Marks</th></tr>
+    <tr><td>A</td><td>Process setup — steps correctly ordered, materials and thicknesses properly specified, model builds without error</td><td class="n">10</td></tr>
+    <tr><td>B</td><td>Understanding and analysis — explains why each step exists and what it enables downstream</td><td class="n">20</td></tr>
+    <tr><td>C</td><td>Cross-section extraction and measurement — correct plane, correct endpoints, measurements within tolerance</td><td class="n">10</td></tr>
+    <tr><td>D</td><td>Engineering judgement — reasoning about the failure case and the gate-first comparison</td><td class="n">10</td></tr>
+  </table>
+  </div>
+
+  <div class="box">
+    <h4>If your build fails</h4>
+    <p>A metrology step that returns <code>NOVAL</code> almost always means the measurement mask does not cover the feature you are measuring, not that the model is wrong. Check the manager log for the step that failed, open the metrology definition, confirm the measurement type against the help entry, then check the mask bounds in the layout editor. Rebuild from the failing step rather than rebuilding all. Bring the log and a screenshot of the metrology definition to the clinic session if it is still unresolved.</p>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section id="quiz">
+  <h2>Self-check</h2>
+  <p class="dek">Five items, immediate feedback, unlimited attempts. Not graded — the graded equivalent sits in the sessional examination.</p>
+  <div id="quizbox"></div>
+  <div class="score" id="score"></div>
+</section>
+
+<!-- ============ PEDAGOGY ============ -->
+<section id="pedagogy">
+  <h2>Innovative pedagogy for this course</h2>
+  <p class="dek">Eight strategies, each chosen because a virtual fabrication platform makes it possible in a classroom that has no cleanroom. Every one names the outcome it serves and the evidence it produces for attainment.</p>
+
+  <h3>1. Simulate before you are taught</h3>
+  <p>Invert the usual order. Students run the process flow in SEMulator3D in the tutorial hour <em>before</em> the lecture that explains it, and write down one prediction and one thing that surprised them. The lecture then answers questions they already hold. This is predict–observe–explain applied to a process flow, and it converts the lecture from transmission into resolution. <em>Serves CO3, CO5. Evidence: prediction sheets, collected and compared against post-lecture revisions.</em></p>
+
+  <h3>2. Process archaeology</h3>
+  <p>Give students a finished 3D model and no recipe. They must reconstruct the process sequence that produced it, from the geometry alone — spacer shapes reveal deposition and etch order, dishing reveals CMP, the absence of an interfacial layer reveals a clean. Reversing the flow tests structural understanding in a way that running it forward never does. <em>Serves CO3, CO4. Evidence: reconstructed step lists marked against the true recipe.</em></p>
+
+  <h3>3. The split-cohort process window</h3>
+  <p>Each team is assigned one parameter — spacer thickness, overpolish, lateral ratio, anneal budget — and sweeps it alone. In the final session the class assembles every team's result into a single process window on one chart. No individual could have produced it; the cohort collectively discovers that windows are multidimensional and that margins interact. <em>Serves CO4. Evidence: the assembled window, plus each team's contribution.</em></p>
+
+  <h3>4. Failure-mode laboratory</h3>
+  <p>One assignment in three is issued deliberately broken — a misplaced metrology mask, a missing etch stop, an anneal in the wrong position. The deliverable is the diagnosis, not the fixed model. Engineers in a fab spend far more time on why a build failed than on builds that work, and assessing debugging directly is both more authentic and far harder to plagiarise. <em>Serves CO4, CO5. Evidence: diagnostic reports graded on Part D of the rubric.</em></p>
+
+  <h3>5. Layout in the morning, cross-section in the afternoon</h3>
+  <p>The hardest conceptual leap in Unit 1 is that a coloured polygon on a layout screen becomes a physical shape in silicon. Pair the two sessions on the same day and on the same design: students draw the inverter layout, then build it and slice it. The mapping stops being an assertion. <em>Serves CO1. Evidence: annotated layout-to-cross-section overlays.</em></p>
+
+  <h3>6. Technology review panel</h3>
+  <p>Teams present a process module to the class as if to a fab technology review — fifteen minutes, questions from a student panel briefed to probe cost, thermal budget and yield. Rotating the panel role teaches students to interrogate a flow, which is the skill Unit 4 and Unit 5 actually assess. <em>Serves CO4. Evidence: presentation and peer-question rubric.</em></p>
+
+  <h3>7. Cost per mask layer</h3>
+  <p>Unit 2 ends with a decision, not a summary: given a target pitch, argue for SADP or for EUV. Teams are given mask counts, tool costs and throughput, and must defend a recommendation. It puts the economic argument that drives real patterning choices in front of students who otherwise learn multiple patterning as a sequence of diagrams. <em>Serves CO2, CO4. Evidence: written recommendation with quantified reasoning.</em></p>
+
+  <h3>8. Viva at the viewer</h3>
+  <p>Replace part of the end-semester laboratory examination with a five-minute oral held at the 3D viewer. The examiner points at a feature; the student explains what made it. It is fast, it is almost impossible to prepare by rote, and it discriminates between students who ran the recipe and students who understood it. <em>Serves CO3, CO5. Evidence: oral rubric, Parts B and D.</em></p>
+
+  <div class="box">
+    <h4>Accessibility and inclusion</h4>
+    <p>Every video carries a transcript and burned-in captions. Every interactive object is keyboard-operable and reports its state in text, so that it works with a screen reader and in a low-bandwidth session where the animation may not load. Colour is never the only channel: the material legend labels every stratum by name as well as by colour, which also matters for the roughly one male student in twelve with a colour-vision deficiency — a real constraint in a subject taught almost entirely through coloured cross-sections.</p>
+  </div>
+</section>
+
+<!-- ============ PRODUCTION ============ -->
+<section id="production">
+  <h2>Production plan</h2>
+  <p class="dek">What it takes to build the remaining 29 micro-lessons, and where the content is hosted.</p>
+
+  <div class="scroll">
+  <table>
+    <tr><th>Asset</th><th class="n">Per lesson</th><th class="n">Course total</th><th>Format</th></tr>
+    <tr><td>Micro-lecture video</td><td class="n">8–12 min</td><td class="n">≈ 5 hours</td><td>MP4 1080p, H.264, captions as WebVTT</td></tr>
+    <tr><td>Transcript</td><td class="n">1</td><td class="n">30</td><td>PDF and HTML, searchable</td></tr>
+    <tr><td>Interactive object</td><td class="n">1</td><td class="n">30</td><td>Self-contained HTML5, no plugin</td></tr>
+    <tr><td>Self-check set</td><td class="n">5 items</td><td class="n">150</td><td>LMS question bank, QTI export</td></tr>
+    <tr><td>Laboratory brief and rubric</td><td class="n">—</td><td class="n">10</td><td>PDF plus SEMulator3D process files</td></tr>
+    <tr><td>Slide deck</td><td class="n">1</td><td class="n">30</td><td>PPTX and PDF</td></tr>
+  </table>
+  </div>
+
+  <p>Hosting is layered so that nothing depends on a single platform: the institutional LMS carries the graded path and the question bank; the videos sit on an institutional channel so that they remain reachable to students without LMS access; the interactive objects are single HTML files that run offline and can be redistributed with no server. Content is released under a Creative Commons licence permitting educational reuse with attribution, which is what makes the material eligible for a SWAYAM or NPTEL-style submission later without renegotiating rights.</p>
+
+  <div class="box">
+    <h4>Provenance</h4>
+    <p>Course plan, outcomes and assessment structure are taken from the approved plan for ECE112 / 213ECE2362, Regulation 2025, academic year 2026–27. SEMulator3D® is a registered product of Coventor, a Lam Research company; screen captures in the video assets are made under the departmental academic licence. Diagrams on this page are original schematics drawn for the course and are not reproduced from any vendor material.</p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer><div class="fin">
+  Advanced CMOS Microfabrication · ECE112 / 213ECE2362 · Department of Electronics and Communication Engineering · Sample digital content for review
+</div></footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- process flow model ---------------- */
+var M={si:'#B03A2E',sige:'#8E44AD',ox:'#5DADE2',ild:'#AED6F1',nit:'#27AE60',
+       poly:'#8C9B9D',hk:'#F1C40F',wfm:'#3D566E',w:'#212F3C',void:'#0E1419'};
+
+var LEGEND=[['Si substrate',M.si],['SiGe S/D epi',M.sige],['SiO₂ interfacial',M.ox],
+            ['SiO₂ ILD',M.ild],['Si₃N₄ spacer / CESL',M.nit],['Poly dummy gate',M.poly],
+            ['HfO₂ high-k',M.hk],['TiN work-function metal',M.wfm],['W fill',M.w]];
+
+/* geometry */
+var GL=290,GR=350,GT=150,SUR=240,BOT=320,LX=40,RX=600;
+
+function r(x,y,w,h,f,extra){
+  return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+f+'"'+(extra||'')+'/>';
+}
+function lbl(x,y,t,c){
+  return '<text x="'+x+'" y="'+y+'" fill="'+(c||'#7E9099')+'" font-family="IBM Plex Mono, monospace" font-size="10.5">'+t+'</text>';
+}
+
+/* returns svg body for step index 0..7 */
+function build(i){
+  var s='';
+  /* substrate always */
+  s+=r(LX,SUR,RX-LX,BOT-SUR,M.si);
+
+  /* source/drain epi from step 3 (index 2) onward */
+  if(i>=2){
+    s+=r(LX+40,SUR-26,GL-22-(LX+40),26,M.sige);
+    s+=r(GR+22,SUR-26,RX-40-(GR+22),26,M.sige);
+  }
+
+  /* ILD + CESL, steps 4-8 */
+  if(i>=3){
+    var top=(i===3)?110:GT;
+    /* CESL thin nitride over topography */
+    var epiTop=(i>=2)?SUR-26:SUR;
+    s+=r(LX,epiTop-7,GL-22-LX,7,M.nit);
+    s+=r(GR+22,epiTop-7,RX-(GR+22),7,M.nit);
+    /* ILD fill */
+    s+=r(LX,top,GL-22-LX,epiTop-7-top,M.ild);
+    s+=r(GR+22,top,RX-(GR+22),epiTop-7-top,M.ild);
+  }
+
+  /* spacers from step 2 (index 1) */
+  if(i>=1){
+    s+=r(GL-22,GT,22,SUR-GT,M.nit);
+    s+=r(GR,GT,22,SUR-GT,M.nit);
+  }
+
+  /* gate trench contents */
+  if(i<=4){
+    /* interfacial oxide + dummy poly */
+    s+=r(GL,SUR-5,GR-GL,5,M.ox);
+    s+=r(GL,GT,GR-GL,SUR-5-GT,M.poly);
+  } else if(i===5){
+    /* dummy removed — empty trench */
+    s+=r(GL,GT,GR-GL,SUR-GT,M.void);
+    s+='<rect x="'+GL+'" y="'+GT+'" width="'+(GR-GL)+'" height="'+(SUR-GT)+'" fill="none" stroke="#4A5A64" stroke-width="1" stroke-dasharray="3 3"/>';
+  } else {
+    /* high-k conformal liner */
+    s+=r(GL,GT,GR-GL,SUR-GT,M.hk);
+    /* WFM inside */
+    s+=r(GL+5,GT,GR-GL-10,SUR-GT-5,M.wfm);
+    if(i===7){
+      s+=r(GL+15,GT,GR-GL-30,SUR-GT-15,M.w);
+    } else {
+      s+=r(GL+15,GT,GR-GL-30,SUR-GT-15,M.void);
+      s+='<rect x="'+(GL+15)+'" y="'+GT+'" width="'+(GR-GL-30)+'" height="'+(SUR-GT-15)+'" fill="none" stroke="#4A5A64" stroke-width="1" stroke-dasharray="3 3"/>';
+    }
+  }
+
+  /* pre-CMP dome on step 4 to show non-planar ILD */
+  if(i===3){
+    s+='<path d="M'+GL+' 110 L'+GL+' 130 L'+GR+' 130 L'+GR+' 110 Z" fill="'+M.ild+'"/>';
+    s+=r(GL,130,GR-GL,20,M.ild);
+  }
+
+  /* annotation: gate length rule */
+  s+='<g>';
+  s+='<line x1="'+GL+'" y1="335" x2="'+GR+'" y2="335" stroke="#5D6F79" stroke-width="1"/>';
+  s+='<line x1="'+GL+'" y1="331" x2="'+GL+'" y2="339" stroke="#5D6F79" stroke-width="1"/>';
+  s+='<line x1="'+GR+'" y1="331" x2="'+GR+'" y2="339" stroke="#5D6F79" stroke-width="1"/>';
+  s+=lbl(GR+8,338,'Lg = 20 nm');
+  s+='</g>';
+  return s;
+}
+
+var STEPS=[
+ {n:'Dummy gate patterning',
+  proc:'Poly deposition, litho, RIE',temp:'620 °C LPCVD',
+  key:'Sacrificial poly on 0.5 nm interfacial SiO₂',
+  metro:'Gate length, poly profile angle'},
+ {n:'Offset spacer formation',
+  proc:'Conformal Si₃N₄ deposition + anisotropic etch',temp:'≈ 600 °C',
+  key:'Spacer width sets the S/D offset',
+  metro:'Spacer width at foot and top'},
+ {n:'Source / drain epitaxy',
+  proc:'Selective SiGe epitaxial growth',temp:'650–750 °C',
+  key:'Compressive strain into the PMOS channel',
+  metro:'Raised epi height, facet angle'},
+ {n:'CESL and ILD deposition',
+  proc:'Si₃N₄ liner then SiO₂ interlayer dielectric',temp:'400–500 °C',
+  key:'Liner is the etch stop for contacts later',
+  metro:'ILD thickness over the gate'},
+ {n:'ILD chemical-mechanical polish',
+  proc:'CMP, stop on poly',temp:'Ambient',
+  key:'Exposes the top of the dummy gate',
+  metro:'Post-CMP dishing, remaining ILD'},
+ {n:'Dummy poly removal',
+  proc:'Selective wet / dry etch of poly + IL strip',temp:'< 100 °C',
+  key:'Leaves an empty self-aligned trench',
+  metro:'Trench depth, spacer loss'},
+ {n:'High-k and work-function metal',
+  proc:'ALD HfO₂, then ALD TiN or TiAl',temp:'250–350 °C',
+  key:'Metal choice sets the threshold voltage',
+  metro:'HfO₂ thickness, WFM conformality'},
+ {n:'Tungsten fill and gate CMP',
+  proc:'W deposition then CMP',temp:'≈ 400 °C',
+  key:'Gate complete; stack never exceeded 750 °C',
+  metro:'Fill voiding, final gate height'}
+];
+
+var cur=0;
+var screen=document.getElementById('screen'),
+    list=document.getElementById('steplist'),
+    read=document.getElementById('readout'),
+    pos=document.getElementById('pos'),
+    prev=document.getElementById('prev'),
+    next=document.getElementById('next');
+
+/* step list */
+STEPS.forEach(function(st,i){
+  var li=document.createElement('li');
+  var b=document.createElement('button');
+  b.type='button';
+  b.innerHTML='<span class="n">'+(i+1)+'</span><span>'+st.n+'</span>';
+  b.addEventListener('click',function(){go(i);});
+  li.appendChild(b);list.appendChild(li);
+});
+
+/* legend */
+document.getElementById('legend').innerHTML=LEGEND.map(function(p){
+  return '<span><i style="background:'+p[1]+'"></i>'+p[0]+'</span>';
+}).join('');
+
+function go(i){
+  cur=Math.max(0,Math.min(STEPS.length-1,i));
+  var st=STEPS[cur];
+  screen.innerHTML='<svg viewBox="0 0 640 348" role="img" aria-label="Cross-section after step '+(cur+1)+': '+st.n+'">'+build(cur)+'</svg>';
+  read.innerHTML=
+    '<div><span>step</span><span>'+(cur+1)+' / 8 — '+st.n+'</span></div>'+
+    '<div><span>process</span><span>'+st.proc+'</span></div>'+
+    '<div><span>thermal</span><span>'+st.temp+'</span></div>'+
+    '<div><span>why</span><span>'+st.key+'</span></div>'+
+    '<div><span>metrology</span><span>'+st.metro+'</span></div>';
+  pos.textContent='Step '+(cur+1)+' of 8';
+  Array.prototype.forEach.call(list.children,function(li,k){
+    li.setAttribute('aria-current',k===cur?'true':'false');
+  });
+  prev.disabled=(cur===0);next.disabled=(cur===STEPS.length-1);
+  try{localStorage.setItem('acm_step',String(cur));}catch(e){}
+}
+prev.addEventListener('click',function(){go(cur-1);});
+next.addEventListener('click',function(){go(cur+1);});
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight')go(cur+1);
+  if(e.key==='ArrowLeft')go(cur-1);
+});
+var start=0;
+try{var v=localStorage.getItem('acm_step');if(v!==null)start=parseInt(v,10)||0;}catch(e){}
+go(start);
+
+/* ---------------- EOT workbench ---------------- */
+var kv=document.getElementById('kv'),tv=document.getElementById('tv');
+function eot(){
+  var k=parseFloat(kv.value),t=parseFloat(tv.value);
+  var e=t*3.9/k;
+  document.getElementById('kvOut').textContent=k.toFixed(1);
+  document.getElementById('tvOut').textContent=t.toFixed(1)+' nm';
+  document.getElementById('eotOut').textContent=e.toFixed(2);
+  document.getElementById('formula').textContent=t.toFixed(1)+' × '+(3.9/k).toFixed(3);
+  document.getElementById('sioOut').textContent=e.toFixed(2)+' nm';
+  document.getElementById('gainOut').textContent=(k/3.9).toFixed(1)+'×';
+  /* illustrative direct-tunnelling estimate: ~1 decade per 0.35 nm of extra barrier */
+  var dec=Math.max(0,(t-e)/0.35);
+  var sup=['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'];
+  var d=Math.round(dec);
+  var txt=d<1?'comparable':'~10'+String(d).split('').map(function(c){return sup[+c];}).join('')+'× lower';
+  document.getElementById('leakOut').textContent=txt;
+}
+kv.addEventListener('input',eot);tv.addEventListener('input',eot);eot();
+
+/* ---------------- self-check ---------------- */
+var QS=[
+{q:'A 1.2 nm SiO₂ gate dielectric is replaced by HfO₂ (k = 22) at the same equivalent oxide thickness. Gate leakage falls by several orders of magnitude. Why?',
+ o:['Hafnium oxide has a wider band gap than silicon dioxide',
+    'The HfO₂ film is physically much thicker, and tunnelling probability depends on physical thickness',
+    'The equivalent oxide thickness of the HfO₂ film is smaller',
+    'Hafnium oxide has a lower defect density'],
+ a:1,
+ f:'Tunnelling depends on the physical distance the carrier must cross. At equal EOT the HfO₂ film is about 5.6 times thicker, so the barrier is far wider. Band gap and defect density matter for other things — they are not what drives this result.'},
+{q:'An HfO₂ film with k = 22 is deposited to 4.4 nm. What is its equivalent oxide thickness?',
+ o:['0.78 nm','1.13 nm','4.40 nm','24.8 nm'],
+ a:0,
+ f:'EOT = t × 3.9/k = 4.4 × 3.9/22 = 0.78 nm. Check the direction of the ratio — a common error is to multiply by k/3.9 and get a number larger than the physical thickness, which cannot be right for a high-k film.'},
+{q:'In a replacement metal gate flow, what is the dummy polysilicon gate actually for?',
+ o:['It conducts current until the metal gate is deposited',
+    'It provides a self-aligned placeholder so spacers and source/drain can be formed before the real gate exists',
+    'It improves adhesion of the high-k dielectric',
+    'It reduces the thermal budget of the source/drain anneal'],
+ a:1,
+ f:'The dummy gate defines the gate footprint and lets the spacers and source/drain regions be self-aligned to it. It is removed before the device ever operates, so it never conducts anything.'},
+{q:'Why is gate-last preferred over gate-first for a high-k / metal gate stack?',
+ o:['Gate-last uses fewer masks',
+    'Gate-last allows a thinner interfacial layer to be grown',
+    'Gate-last keeps the high-k and work-function metal out of the high-temperature source/drain activation anneal',
+    'Gate-last avoids the need for chemical-mechanical polishing'],
+ a:2,
+ f:'Thermal budget is the whole reason. Gate-last is more complex and adds a CMP step rather than avoiding one — that complexity is the price paid to keep the gate stack below roughly 750 °C.'},
+{q:'Polysilicon gate depletion degrades a scaled transistor because it:',
+ o:['Increases gate leakage current through the dielectric',
+    'Adds a depletion capacitance in series with the oxide, raising the effective electrical thickness',
+    'Pins the Fermi level at the poly–dielectric interface',
+    'Prevents dopant activation in the source and drain'],
+ a:1,
+ f:'The depletion region behaves as a capacitor in series with the gate oxide, so the total gate capacitance falls — equivalent to adding roughly 0.3 to 0.4 nm of oxide. Fermi-level pinning is a real and separate problem; keep the two distinct.'}
+];
+
+var qb=document.getElementById('quizbox'),answered={};
+QS.forEach(function(item,qi){
+  var d=document.createElement('div');d.className='q';
+  var h='<div class="stem">'+(qi+1)+'. '+item.q+'</div>';
+  item.o.forEach(function(op,oi){
+    h+='<label class="opt" data-q="'+qi+'" data-o="'+oi+'"><input type="radio" name="q'+qi+'">'+op+'</label>';
+  });
+  h+='<div class="fb" id="fb'+qi+'">'+item.f+'</div>';
+  d.innerHTML=h;qb.appendChild(d);
+});
+
+qb.addEventListener('change',function(e){
+  var lab=e.target.closest('.opt');if(!lab)return;
+  var qi=+lab.dataset.q,oi=+lab.dataset.o;
+  var opts=qb.querySelectorAll('.opt[data-q="'+qi+'"]');
+  Array.prototype.forEach.call(opts,function(o){o.classList.remove('right','wrong');});
+  if(oi===QS[qi].a){lab.classList.add('right');answered[qi]=1;}
+  else{lab.classList.add('wrong');opts[QS[qi].a].classList.add('right');answered[qi]=0;}
+  document.getElementById('fb'+qi).classList.add('show');
+  var got=0,done=0;
+  for(var k in answered){done++;got+=answered[k];}
+  document.getElementById('score').textContent=got+' correct of '+done+' attempted';
+  try{localStorage.setItem('acm_quiz',JSON.stringify(answered));}catch(e2){}
+});
+})();
+</script>
+</body>
+</html>
